@@ -3,9 +3,17 @@
 namespace App\Service;
 
 use App\Dto\GeneratePasswordDTO;
+use App\Manager\PasswordManager;
+use App\Repository\PasswordRepository;
 
 class PasswordGenerateService
 {
+    public function __construct(
+        private readonly PasswordRepository $passwordRepository,
+        private readonly PasswordManager $passwordManager,
+    ) {
+    }
+
     public function generatePassword(GeneratePasswordDTO $generatePasswordDTO): string
     {
         $selectedCharacters = [];
@@ -23,26 +31,36 @@ class PasswordGenerateService
             return 'Please select at least one character type!';
         }
 
-        $passwordLength = $generatePasswordDTO->getPasswordLength();
+        $length = $generatePasswordDTO->getPasswordLength();
         $allChars = array_merge(...array_values($selectedCharacters));
         $uniqueCount = count($allChars);
 
-        if ($passwordLength > $uniqueCount) {
+        if ($length > $uniqueCount) {
             return 'Password length too long for unique characters!';
         }
 
+        do {
+            $password = $this->generateUniquePassword($selectedCharacters, $length);
+        } while (!$this->checkUniquenessAndStore($password, $length));
+
+        return $password;
+    }
+
+    private function generateUniquePassword(array $selectedCharacters, int $length): string
+    {
         $password = [];
 
         foreach ($selectedCharacters as $type => $values) {
             $index = array_rand($values);
             $password[] = $values[$index];
+
             unset($values[$index]);
-            $selectedCharacters[$type] = $values;
+            $selectedCharacters[$type] = array_values($values);
         }
 
         $remainingChars = array_merge(...array_values($selectedCharacters));
 
-        while (count($password) < $passwordLength) {
+        while (count($password) < $length) {
             $index = array_rand($remainingChars);
             $password[] = $remainingChars[$index];
             unset($remainingChars[$index]);
@@ -50,5 +68,15 @@ class PasswordGenerateService
         }
 
         return implode('', $password);
+    }
+    private function checkUniquenessAndStore(string $password, int $length): bool
+    {
+        if ($this->passwordRepository->findOneBy(['password' => $password, 'length' => $length])) {
+            return false;
+        }
+
+        $this->passwordManager->add($password, $length);
+
+        return true;
     }
 }
