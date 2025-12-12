@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <title>Password generator</title>
+    </head>
+    <body>
+    {{ form_start(form) }}
+    <div style="max-width: 200px; margin: 20px auto; font-family: Arial, sans-serif;">
+        <div style="margin-bottom: 15px;">
+            <label style="display: block; font-weight: bold; margin-bottom: 5px;">
+                {{ form_label(form.passwordLength) }}
+            </label>
+            {{ form_widget(form.passwordLength, {'attr': {'style': 'width: 100%; padding: 5px; text-align:center'}}) }}
+        </div>
+        <div style="margin-bottom: 15px;">
+            <div style="display: flex; align-items: center; margin-bottom: 5px;">
+                {{ form_widget(form.numbers, {'attr': {'style': 'margin-right: 5px;'}}) }}
+                {{ form_label(form.numbers) }}
+            </div>
+            <div style="display: flex; align-items: center; margin-bottom: 5px;">
+                {{ form_widget(form.lowercase, {'attr': {'style': 'margin-right: 5px;'}}) }}
+                {{ form_label(form.lowercase) }}
+            </div>
+            <div style="display: flex; align-items: center; margin-bottom: 5px;">
+                {{ form_widget(form.uppercase, {'attr': {'style': 'margin-right: 5px;'}}) }}
+                {{ form_label(form.uppercase) }}
+            </div>
+        </div>
+        <div style="text-align: center">
+            {{ form_widget(form.generate, {'attr': {'style': 'padding: 8px 16px; font-weight: bold;'}}) }}
+        </div>
+    </div>
+    {{ form_end(form) }}
+
+    {% if password is not null %}
+        <div style="max-width: 400px; margin: 20px auto; font-family: Arial, sans-serif;">
+            <div style="text-align:center; margin-bottom: 15px;">
+                <p style="font-weight: bold; font-size: 20px;">{{ password }}</p>
+            </div>
+        </div>
+    {% endif %}
+    </body>
+</html>
