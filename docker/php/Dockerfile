@@ -8,7 +8,11 @@ RUN apt-get update && apt-get install -y \
     libicu-dev \
     libonig-dev \
     zlib1g-dev \
-    && docker-php-ext-install pdo pdo_mysql intl zip opcache bcmath \
+    libpng-dev \
+    libjpeg-dev \
+    libfreetype6-dev \
+    && docker-php-ext-configure intl \
+    && docker-php-ext-install pdo pdo_mysql intl zip opcache bcmath gd \
     && rm -rf /var/lib/apt/lists/*
 
 COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
@@ -22,3 +26,4 @@ COPY docker/php/entrypoint /entrypoint
 RUN chmod +x /entrypoint
 
 ENTRYPOINT ["/entrypoint"]
+CMD ["php", "-a"]
