@@ -26,4 +26,3 @@ COPY docker/php/entrypoint /entrypoint
 RUN chmod +x /entrypoint
 
 ENTRYPOINT ["/entrypoint"]
-CMD ["php", "-a"]
